@@ -11,7 +11,7 @@ FROM node:16-alpine AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-RUN yarn build && yarn install
+RUN yarn deploy
 
 # Production image, copy all the files and run next
 FROM node:alpine AS runner
@@ -27,6 +27,7 @@ RUN adduser -S nextjs -u 1001
 # COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.keystone ./.keystone
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/keystone.db ./keystone.db
 COPY --from=builder /app/package.json ./package.json
 
 USER nextjs
